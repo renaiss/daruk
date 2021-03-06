@@ -15,7 +15,8 @@
     "test": "cross-env TS_NODE_FILES=true nyc --reporter=lcov --reporter=text-summary --cache mocha --timeout 15000 --exit ./test/{,/**/}*.test.ts",
     "tslint": "tslint --project . ./src/**/*.ts",
     "prepublish": "npm run build",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "test_middleware": "ts-node --project tsconfig.json --files test/middleware/index.ts"
   },
   "types": "./types/index.d.ts",
   "files":[

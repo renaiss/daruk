@@ -37,44 +37,6 @@ export function disabled() {
 }
 
 /**
- * @desc 将函数的返回打包到 ctx.body，并返回 application/json 类型
- * @return MethodDecorator - 装饰器
- * @example
- *    class Class {
- *      @json()
- *      index(ctx) {
- *        return {
- *          foo: 1
- *        }
- *      }
- *    }
- *    // the same as
- *    class Class {
- *      async index(ctx, next) {
- *        ctx.body = {
- *          foo: 1
- *        }
- *        ctx.type = 'application/json'
- *        await next()
- *      }
- *    }
- */
-export function json() {
-  return (proto: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
-    const oldFunc = descriptor.value;
-    type('application/json')(proto, propertyKey, descriptor);
-
-    descriptor.value = async function jsonWrap(ctx: koa.Context, next: () => Promise<void>) {
-      // tslint:disable-next-line:no-invalid-this
-      const val = await oldFunc.call(this, ...arguments);
-      // 确保是Object类型
-      ctx.body = { ...val };
-      await next();
-    };
-  };
-}
-
-/**
  * URL 重定向
  * @param {string} path - 跳转的路径
  */
@@ -83,31 +45,6 @@ export function redirect(path: string) {
   return (proto: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
     const target = proto.constructor;
     Reflect.defineMetadata(CONTROLLER_REDIRECT_PATH, path, target, propertyKey);
-  };
-}
-
-/**
- * 设置 response Content-Type
- * @param {string} type - `Content-Type` 内容
- * @example
- *    @type('.png')
- *
- *    @type('png')
- *
- *    @type('image/png')
- *
- *    @type('text/plain; charset=utf-8')
- */
-export function type(type: string) {
-  assert(is.string(type), `[Decorator @${type}] parameter must be a string`);
-  return (proto: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
-    const oldFunc = descriptor.value;
-    descriptor.value = async function typeWrap(ctx: koa.Context, next: () => Promise<void>) {
-      // tslint:disable-next-line:no-invalid-this
-      await oldFunc.call(this, ...arguments);
-      ctx.type = type;
-      await next();
-    };
   };
 }
 
@@ -156,7 +93,7 @@ export function cache(callback: (cacheKey: string, shouldCacheData?: string) => 
       } else {
         // tslint:disable-next-line:no-invalid-this
         await oldFunc.call(this, ...arguments);
-        await callback(cacheKey, ctx.body);
+        await callback(cacheKey, ctx.body as any);
       }
       await next();
     };

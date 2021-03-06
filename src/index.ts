@@ -8,4 +8,5 @@ export * from './decorators';
 export * from './typings/daruk';
 export { CronJob } from 'cron';
 import Daruk from './core/daruk';
+import "./middlewares"
 export { Daruk };

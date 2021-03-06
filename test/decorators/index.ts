@@ -179,8 +179,9 @@ class Index {
   }
   @json()
   @get('/json1')
-  public json() {
-    return { foo: 1 };
+  public async json(ctx: DarukContext, next: Next) {
+    ctx.body = { foo: 1 };
+    await next();
   }
   @redirect('/json2')
   @get('/redirect')
@@ -189,10 +190,11 @@ class Index {
   }
   @type('application/json')
   @get('/type')
-  public type(ctx: DarukContext) {
+  public async type(ctx: DarukContext, next: Next) {
     ctx.body = {
       foo: 1
     };
+    await next();
   }
 
   @header('foo', 'bar')
